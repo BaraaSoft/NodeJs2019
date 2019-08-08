@@ -12,4 +12,15 @@ app.use(json())
 app.use(urlencoded({ extended: true }))
 app.use(morgan('dev'))
 
-export const start = () => { }
+app.get('/', (req, res) => {
+    res.send({ message: 'hello api?' })
+});
+app.post('/', (req, res) => {
+    res.send({ message: `server: ${req.body.message || "no message"}` });
+})
+
+export const start = () => {
+    app.listen(3000, () => {
+        console.log(`server up on port ${3000}`)
+    })
+}
