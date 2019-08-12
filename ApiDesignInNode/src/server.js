@@ -1,9 +1,12 @@
 import express from 'express'
 import { json, urlencoded } from 'body-parser'
 import morgan from 'morgan'
-import cors from 'cors'
+import cors from 'cors';
 
-import ItemRouter from './resources/item/item.route'
+import { dbconnection } from './utils/db';
+
+import ItemRouter from './resources/item/item.route';
+import UserRouter from './resources/user/user.route'
 
 export const app = express()
 
@@ -30,6 +33,8 @@ app.use(logParams)
 
 /**** Resource Routers *****/
 app.use('/item', ItemRouter);
+app.use('/users', UserRouter)
+
 /**************************/
 
 app.get('/', (req, res) => {
@@ -40,8 +45,14 @@ app.post('/', (req, res) => {
     res.send({ message: `server: ${req.body.message || "no message"}` });
 })
 
-export const start = () => {
-    app.listen(3000, () => {
-        console.log(`server up on port ${3000}`)
-    })
+export const start = async () => {
+    try {
+        await dbconnection();
+        app.listen(3000, () => {
+            console.log(`server up on port ${3000}`)
+        })
+    } catch (e) {
+        console.log(e)
+    }
+
 }
