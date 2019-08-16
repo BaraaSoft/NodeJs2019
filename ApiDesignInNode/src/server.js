@@ -24,7 +24,6 @@ app.use(morgan('dev'))
 const logParams = (req, res, next) => {
     console.log(">> logParams:")
     console.log(req.query)
-
     console.log(ItemRouter.stack.map(x => console.log(x)))
     next();
 }
