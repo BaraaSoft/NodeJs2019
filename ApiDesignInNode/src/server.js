@@ -4,6 +4,7 @@ import morgan from 'morgan'
 import cors from 'cors';
 
 import { dbconnection } from './utils/db';
+import { signUp, signIn, protect } from './utils/auth'
 
 import ItemRouter from './resources/item/item.route';
 import UserRouter from './resources/user/user.route'
@@ -36,8 +37,13 @@ app.use('/users', UserRouter)
 
 /**************************/
 
-app.get('/', (req, res) => {
 
+app.post('/signup', signUp);
+app.post('/signin', signIn);
+app.get('/protect', protect);
+
+
+app.get('/', (req, res) => {
     res.send({ message: 'hello api?' })
 });
 app.post('/', (req, res) => {
@@ -47,8 +53,8 @@ app.post('/', (req, res) => {
 export const start = async () => {
     try {
         await dbconnection();
-        app.listen(3000, () => {
-            console.log(`server up on port ${3000}`)
+        app.listen(90, () => {
+            console.log(`server up on port ${90}`)
         })
     } catch (e) {
         console.log(e)

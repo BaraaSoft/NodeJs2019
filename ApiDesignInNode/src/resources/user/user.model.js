@@ -29,7 +29,7 @@ userSchema.pre('save', function (next) {
     }).catch(error => next(error))
 })
 
-userSchema.methods.checkPassword = async (password) => {
+userSchema.methods.checkPassword = async function (password) {
     const hash = this.password;
     return new Promise((resolve, reject) => {
         bcrypt.compare(password, hash, (error, res) => {
