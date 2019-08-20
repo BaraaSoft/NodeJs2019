@@ -44,6 +44,7 @@ app.get('/protect', protect);
 
 
 app.get('/', (req, res) => {
+
     res.send({ message: 'hello api?' })
 });
 app.post('/', (req, res) => {
@@ -53,8 +54,8 @@ app.post('/', (req, res) => {
 export const start = async () => {
     try {
         await dbconnection();
-        app.listen(90, () => {
-            console.log(`server up on port ${90}`)
+        app.listen(9001, () => {
+            console.log(`server up on port ${9001}`)
         })
     } catch (e) {
         console.log(e)

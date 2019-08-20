@@ -2,17 +2,19 @@ import jwt from 'jsonwebtoken';
 import { UserModel } from '../resources/user/user.model'
 
 
-export const sign = (user, key) => {
+const sign = (user) => {
+    const key = "NodeJsApiDesign201908";
     return new Promise((resolve, reject) => {
-        const token = jwt.sign({ id: user._id }, key);
+        const token = jwt.sign({ id: user._id, email: user.email }, key);
         resolve(token);
     })
 }
-export const verify = (token, key) => {
+const verify = (token) => {
+    const key = "NodeJsApiDesign201908";
     return new Promise((resolve, reject) => {
         try {
-            var id = jwt.verify(token, key);
-            resolve(id)
+            var user = jwt.verify(token, key);
+            resolve(user)
         } catch (e) {
             reject(e)
         }
@@ -23,7 +25,7 @@ export const signUp = async (req, res) => {
     const newUser = req.body;
     const userExist = await UserModel.findOne({ email: newUser.email }).select('email').exec();
     if (userExist) {
-        res.status(401).json({
+        res.status(422).json({
             error: {
                 message: "user already exist"
             }
@@ -31,9 +33,8 @@ export const signUp = async (req, res) => {
         return;
     }
     const user = await UserModel.create(newUser);
-    console.log(`>> Password : ${user.password}`)
     try {
-        const token = await sign(user, user.password);
+        const token = await sign(user);
         res.status(201).json({
             data: user,
             token: token
@@ -47,18 +48,14 @@ export const signUp = async (req, res) => {
 
 export const signIn = async (req, res) => {
     const xuser = req.body;
-    console.log(xuser)
-    //const user = await UserModel.findOne({ email: xuser.email }).exec();
-    //if (!user.email) return res.status(401).json({ error: "signIn failed" });
+    const user = await UserModel.findOne({ email: xuser.email }).exec();
+    if (!user.email) return res.status(404).json({ error: `No user with email:${xuser.email}  has been found` });
     try {
-        //const valid = await user.findOne({ email: xuser.email }).checkPassword(xuser.password)
-        UserModel.where({ email: xuser.email }).findOne(async (error, usermodel) => {
-            const valid = usermodel.checkPassword(xuser.password)
-            if (!valid) return res.status(401).json({ error: "signIn failed" });
-            const token = await sign(usermodel, usermodel.password);
-            res.send({
-                token
-            })
+        const valid = await user.checkPassword(xuser.password)
+        if (!valid) return res.status(401).json({ error: "signIn failed" });
+        const token = await sign(user);
+        res.send({
+            token
         })
 
     } catch (error) {
@@ -69,18 +66,19 @@ export const signIn = async (req, res) => {
     }
 }
 
-export const protect = async (req, res) => {
-    const { token, email } = req.query
-    const user = await UserModel.where({ email: email }).findOne().exec();
-    if (!user) return res.status(401).json({ error: "access failed" })
-
-
+export const protect = async (req, res, next) => {
+    const token = req.headers.authorization.split('Bearer')[1].trim()
+    if (!token) return res.status(401).end();
     try {
-        const userIdToken = await verify(token, user.password);
-        if (user._id == userIdToken.id) {
-            res.send({
-                message: 'Access successfully'
-            })
+        const user = await verify(token);
+        const savedUser = await UserModel.findById(user.id)
+            .select('-password')
+            .lean()
+            .exec();
+        if (!savedUser.email) return res.status(401).json({ error: `Invalid token` })
+        if (savedUser._id == user.id) {
+            req.user = savedUser;
+            return next();
         }
 
     } catch (e) {
