@@ -24,26 +24,24 @@ app.use(morgan('dev'))
 const logParams = (req, res, next) => {
     console.log(">> logParams:")
     console.log(req.query)
-
     console.log(ItemRouter.stack.map(x => console.log(x)))
     next();
 }
 app.use(logParams)
 /**************************/
 
+
+
 /**** Resource Routers *****/
 app.use('/item', ItemRouter);
 app.use('/users', UserRouter)
-
 /**************************/
 
-app.get('/', (req, res) => {
 
+
+app.get('/test', (req, res) => {
     res.send({ message: 'hello api?' })
 });
-app.post('/', (req, res) => {
-    res.send({ message: `server: ${req.body.message || "no message"}` });
-})
 
 export const start = async () => {
     try {

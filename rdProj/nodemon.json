@@ -9,6 +9,7 @@
   "execMap": {
     "js": "node"
   },
+  
   "runOnChangeOnly": false,
   "watch": [
     "src/**/*.js",

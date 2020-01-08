@@ -8,7 +8,9 @@
 		"2000:90"
 	],
 	// Uncomment the next line if you want to add in default container specific settings.json values
-	// "settings":  { "workbench.colorTheme": "Quiet Light" },
+	"settings": {
+		"workbench.colorTheme": "Quiet Light"
+	},
 	// Uncomment the next line to run commands after the container is created.
 	// "postCreateCommand": "yarn install",
 	// Uncomment the next line to use a non-root user. See https://aka.ms/vscode-remote/containers/non-root-user.
